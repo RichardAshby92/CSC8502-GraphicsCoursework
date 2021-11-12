@@ -8,26 +8,40 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	quad = Mesh::GenerateQuad();
 
 	//load textures
+	//waterTex = SOIL_load_OGL_texture(TEXTUREDIR"water.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS); old texture not working? 
 	waterTex = SOIL_load_OGL_texture(TEXTUREDIR"water.TGA", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
-	sandTex = SOIL_load_OGL_texture(TEXTUREDIR"Barren Reds.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
-	cubeMap = SOIL_load_OGL_cubemap(TEXTUREDIR"rusted_west.JPG", TEXTUREDIR"rusted_east.JPG", TEXTUREDIR"rusted_up.JPG", TEXTUREDIR"rusted_down.JPG",
-		TEXTUREDIR"rusted_south.JPG", TEXTUREDIR"rusted_north.JPG", SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, 0);
+	sandTex = SOIL_load_OGL_texture(TEXTUREDIR"sand.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+	cubeMap = SOIL_load_OGL_cubemap(TEXTUREDIR"yellowcloud_ft.JPG", TEXTUREDIR"yellowcloud_bk.JPG", TEXTUREDIR"yellowcloud_up.JPG",
+		TEXTUREDIR"yellowcloud_dn.JPG", TEXTUREDIR"yellowcloud_rt.JPG", TEXTUREDIR"yellowcloud_lf.JPG", SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, 0);
 
 	if (!waterTex || !sandTex || !cubeMap) { return; }
+
+	SetTextureRepeating(waterTex, true);
+	SetTextureRepeating(sandTex, true);
+
+
 	//load heightmaps
-	heightmap = new HeightMap(TEXTUREDIR"noise.png");
+	heightmap = new HeightMap(TEXTUREDIR"islandMap.JPG");
+	if (!heightmap) { return; }
+	Vector3	heightmapSize = heightmap->GetHeightmapSize();
 
 	//load camera
-	camera = new Camera();
+	camera = new Camera(0.0f, 0.0f, heightmapSize * Vector3(0.5f, 0.5f, 0.5f));
+	projMatrix = Matrix4::Perspective(1.0f, 15000.0f, (float)width / (float)height, 45.0f);
+	//othographic projmatrix here
 
 	//load shaders
-	lightShader = new Shader("basicVertex.glsl", "colourFragment.glsl");
-	reflectShader = new Shader("basicVertex.glsl", "colourFragment.glsl");
-	skyboxShader = new Shader("basicVertex.glsl", "colourFragment.glsl");
+	lightShader = new Shader("PerPixelVertex.glsl", "PerPixelFragment.glsl");
+	reflectShader = new Shader("reflectVertex.glsl", "reflectFragment.glsl");
+	skyboxShader = new Shader("skyboxVertex.glsl", "skyboxFragment.glsl");
 
 	if(!lightShader->LoadSuccess() || !reflectShader->LoadSuccess() || !skyboxShader->LoadSuccess()) {return;}
 
 	//load lights
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	init = true;
 }
@@ -40,15 +54,30 @@ Renderer::~Renderer()	{
 }
 
 void Renderer::UpdateScene(float dt) {
-
+	camera->UpdateCamera(dt);
+	viewMatrix = camera->BuildViewMatrix();
 }
 
 void Renderer::RenderScene()	{
-	glClearColor(0.2f,0.2f,0.2f,1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);	
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	//disable culling etc
 
-	BindShader(basicShader);
-	triangle->Draw();
+	DrawSkyBox();
+
+	//renable culling etc
 }
 
 //helper functions
+void Renderer::DrawSkyBox() {
+
+	BindShader(skyboxShader);
+	UpdateShaderMatrices();
+
+	quad->Draw();
+}
+
+void Renderer::DrawHeightMap() {
+	BindShader();
+
+	heightmap->Draw();
+}

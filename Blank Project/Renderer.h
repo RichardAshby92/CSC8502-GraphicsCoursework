@@ -14,6 +14,9 @@ public:
 	 void UpdateScene(float dt)	override;
 protected:
 	
+	void DrawSkyBox();
+	void DrawHeightMap();
+
 	HeightMap* heightmap;
 
 	Mesh* quad;
@@ -25,6 +28,8 @@ protected:
 	Camera* camera;
 
 	GLuint sandTex;
+	GLuint sandBump;
 	GLuint waterTex;
+	GLuint waterBump;
 	GLuint cubeMap;
 };
