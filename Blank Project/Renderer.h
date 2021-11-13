@@ -4,6 +4,7 @@
 class Camera;
 class Mesh;
 class HeightMap;
+class SceneNode;
 
 class Renderer : public OGLRenderer	{
 public:
@@ -16,11 +17,14 @@ protected:
 	
 	void DrawSkyBox();
 	void DrawHeightMap();
+	void DrawWater();
+	void DrawNode(SceneNode* n);
 
 	HeightMap* heightmap;
 
 	Mesh* quad;
 
+	Shader* basicShader;
 	Shader* lightShader;
 	Shader* reflectShader;
 	Shader* skyboxShader;
@@ -32,4 +36,6 @@ protected:
 	GLuint waterTex;
 	GLuint waterBump;
 	GLuint cubeMap;
+
+	SceneNode* root;
 };

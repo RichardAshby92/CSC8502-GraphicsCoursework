@@ -2,6 +2,7 @@
 #include "../NCLGL/OGLRenderer.h"
 #include "../nclgl/Camera.h"
 #include "../nclgl/HeightMap.h"
+#include "../nclgl/SceneNode.h"
 
 Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	//load meshses
@@ -31,13 +32,19 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	//othographic projmatrix here
 
 	//load shaders
-	lightShader = new Shader("PerPixelVertex.glsl", "PerPixelFragment.glsl");
+	//lightShader = new Shader("PerPixelVertex.glsl", "PerPixelFragment.glsl"); To be Added Later
+	basicShader = new Shader("TexturedVertex.glsl", "TexturedFragment.glsl");
 	reflectShader = new Shader("reflectVertex.glsl", "reflectFragment.glsl");
 	skyboxShader = new Shader("skyboxVertex.glsl", "skyboxFragment.glsl");
 
-	if(!lightShader->LoadSuccess() || !reflectShader->LoadSuccess() || !skyboxShader->LoadSuccess()) {return;}
+	if(/*!lightShader->LoadSuccess() */ !basicShader->LoadSuccess() || !reflectShader->LoadSuccess() || !skyboxShader->LoadSuccess()) { return; }
+
+	//load root
+	root = new SceneNode();
 
 	//load lights
+
+	//GL States
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -63,21 +70,40 @@ void Renderer::RenderScene()	{
 	//disable culling etc
 
 	DrawSkyBox();
+	DrawHeightMap();
+	DrawWater();
+	DrawNode(root);
 
 	//renable culling etc
 }
 
 //helper functions
 void Renderer::DrawSkyBox() {
+	glDepthMask(GL_FALSE);
 
 	BindShader(skyboxShader);
 	UpdateShaderMatrices();
 
 	quad->Draw();
+
+	glDepthMask(GL_TRUE);
 }
 
 void Renderer::DrawHeightMap() {
-	BindShader();
+	BindShader(basicShader); //change later
+	UpdateShaderMatrices();
+
+	glUniform1i(glGetUniformLocation(basicShader->GetProgram(), "diffuseTex"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, sandTex);
 
 	heightmap->Draw();
+}
+
+void Renderer::DrawWater() {
+
+}
+
+void Renderer::DrawNode(SceneNode* n) {
+
 }

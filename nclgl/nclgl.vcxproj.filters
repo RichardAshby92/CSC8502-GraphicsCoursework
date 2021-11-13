@@ -34,6 +34,7 @@
     </ClCompile>
     <ClCompile Include="HeightMap.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="SceneNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />
@@ -79,6 +80,7 @@
     </ClInclude>
     <ClInclude Include="HeightMap.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="SceneNode.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GLAD">
