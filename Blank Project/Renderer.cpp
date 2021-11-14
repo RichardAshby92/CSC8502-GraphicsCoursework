@@ -12,10 +12,18 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	//waterTex = SOIL_load_OGL_texture(TEXTUREDIR"water.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS); old texture not working? 
 	waterTex = SOIL_load_OGL_texture(TEXTUREDIR"water.TGA", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
 	sandTex = SOIL_load_OGL_texture(TEXTUREDIR"sand.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+	rockTex = SOIL_load_OGL_texture(TEXTUREDIR"rock.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+	grassTex = SOIL_load_OGL_texture(TEXTUREDIR"grass2.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+
+	waterBump = SOIL_load_OGL_texture(TEXTUREDIR"Barren RedsDOT3.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+	sandBump = SOIL_load_OGL_texture(TEXTUREDIR"Barren RedsDOT3.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+	rockBump = SOIL_load_OGL_texture(TEXTUREDIR"Barren RedsDOT3.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+	grassBump = SOIL_load_OGL_texture(TEXTUREDIR"Barren RedsDOT3.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+
 	cubeMap = SOIL_load_OGL_cubemap(TEXTUREDIR"yellowcloud_ft.JPG", TEXTUREDIR"yellowcloud_bk.JPG", TEXTUREDIR"yellowcloud_up.JPG",
 		TEXTUREDIR"yellowcloud_dn.JPG", TEXTUREDIR"yellowcloud_rt.JPG", TEXTUREDIR"yellowcloud_lf.JPG", SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, 0);
 
-	if (!waterTex || !sandTex || !cubeMap) { return; }
+	if (!waterTex || !sandTex || !rockTex || !grassTex || !cubeMap ) { return; }
 
 	SetTextureRepeating(waterTex, true);
 	SetTextureRepeating(sandTex, true);
@@ -50,6 +58,8 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
+	// Bools and such
+	waterMov = 0.0f;
 	init = true;
 }
 Renderer::~Renderer()	{
@@ -71,9 +81,8 @@ void Renderer::RenderScene()	{
 
 	DrawSkyBox();
 	DrawHeightMap();
-	DrawWater();
 	DrawNode(root);
-
+	DrawWater();
 	//renable culling etc
 }
 
@@ -100,10 +109,11 @@ void Renderer::DrawHeightMap() {
 	heightmap->Draw();
 }
 
-void Renderer::DrawWater() {
+void Renderer::DrawNode(SceneNode* n) {
 
 }
 
-void Renderer::DrawNode(SceneNode* n) {
+void Renderer::DrawWater() {
+	BindShader(reflectShader);
 
 }

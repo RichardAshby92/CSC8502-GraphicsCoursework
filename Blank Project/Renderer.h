@@ -32,10 +32,18 @@ protected:
 	Camera* camera;
 
 	GLuint sandTex;
-	GLuint sandBump;
 	GLuint waterTex;
+	GLuint rockTex;
+	GLuint grassTex;
+
+	GLuint sandBump;
 	GLuint waterBump;
+	GLuint rockBump;
+	GLuint grassBump;
+
 	GLuint cubeMap;
 
 	SceneNode* root;
+
+	float waterMov;
 };
