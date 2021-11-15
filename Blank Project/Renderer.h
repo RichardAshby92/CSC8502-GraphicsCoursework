@@ -23,6 +23,7 @@ protected:
 	void DrawNode(SceneNode* n);
 
 	HeightMap* heightmap;
+	Vector3	heightmapSize;
 
 	Mesh* quad;
 	Mesh* cube;

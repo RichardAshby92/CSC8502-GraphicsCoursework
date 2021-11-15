@@ -1,10 +1,11 @@
 #include "Renderer.h"
-#include "../NCLGL/OGLRenderer.h"
+//#include "../NCLGL/OGLRenderer.h"
 #include "../nclgl/Camera.h"
 #include "../nclgl/HeightMap.h"
 #include "../nclgl/SceneNode.h"
 #include "../nclgl/Light.h"
 #include "../nclgl/Island.h"
+#include "../nclgl/Shader.h"
 
 Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	//load meshses
@@ -42,12 +43,15 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	//othographic projmatrix here
 
 	//load shaders
-	//lightShader = new Shader("PerPixelVertex.glsl", "PerPixelFragment.glsl"); To be Added Later
 	basicShader = new Shader("TexturedVertex.glsl", "TexturedFragment.glsl");
-	reflectShader = new Shader("reflectVertex.glsl", "reflectFragment.glsl");
 	skyboxShader = new Shader("skyboxVertex.glsl", "skyboxFragment.glsl");
+	reflectShader = new Shader("reflectVertex.glsl", "reflectFragment.glsl");
+	lightShader = new Shader("PerPixelVertex.glsl", "PerPixelFragment.glsl");
 
-	if(/*!lightShader->LoadSuccess() */ !basicShader->LoadSuccess() || !reflectShader->LoadSuccess() || !skyboxShader->LoadSuccess()) { return; }
+	if (!basicShader->LoadSuccess()) { return; }
+	if (!skyboxShader->LoadSuccess()) { return; } 
+	if (!reflectShader->LoadSuccess()) {return;} 
+	if (!lightShader->LoadSuccess()) { return; }
 
 	//load root
 	root = new SceneNode();
@@ -56,7 +60,7 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	//load lights
 	sun = new Light(heightmapSize * Vector3(0.5f, 1.5f, 0.5f), Vector4(1, 1, 1, 1), heightmapSize.x * 0.5f);
 
-	//PostProcessing
+	//PostProcessing Buffers
 
 	//GL States
 	glEnable(GL_DEPTH_TEST);
@@ -88,11 +92,8 @@ void Renderer::RenderScene()	{
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	//disable culling etc
 
-	//DrawSkyBox();
+	DrawSkyBox();
 	DrawHeightMap();
-
-
-
 	DrawNode(root);
 	DrawWater();
 	//renable culling etc
@@ -103,21 +104,27 @@ void Renderer::DrawSkyBox() {
 	glDepthMask(GL_FALSE);
 
 	BindShader(skyboxShader);
-	UpdateShaderMatrices();
 
+	UpdateShaderMatrices();
 	quad->Draw();
 
 	glDepthMask(GL_TRUE);
 }
 
 void Renderer::DrawHeightMap() {
-	BindShader(basicShader); //change later
-	UpdateShaderMatrices();
+	BindShader(lightShader); //change later
+	SetShaderLight(*sun);
+	
+	glUniform3fv(glGetUniformLocation(lightShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
 
 	glUniform1i(glGetUniformLocation(basicShader->GetProgram(), "diffuseTex"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, sandTex);
 
+	modelMatrix.ToIdentity();
+	textureMatrix.ToIdentity();
+	
+	UpdateShaderMatrices();
 	heightmap->Draw();
 }
 
@@ -144,5 +151,28 @@ void Renderer::DrawNode(SceneNode* n) {
 
 void Renderer::DrawWater() {
 	BindShader(reflectShader);
+
+	glUniform3fv(glGetUniformLocation(reflectShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
+
+	glUniform1i(glGetUniformLocation(reflectShader->GetProgram(), "diffuseTex"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, waterTex);
+
+	glUniform1i(glGetUniformLocation(reflectShader->GetProgram(), "cubeTex"), 2);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
+
+	modelMatrix =
+		Matrix4::Translation(heightmapSize * 0.5f) *
+		Matrix4::Scale(heightmapSize * 0.5f) *
+		Matrix4::Rotation(90, Vector3(1, 0, 0));
+
+	textureMatrix =
+		Matrix4::Translation(Vector3(waterMov, 0.0f, waterMov)) *
+		Matrix4::Scale(Vector3(10, 10, 10)) *
+		Matrix4::Rotation(0.0f, Vector3(0, 0, 1));
+
+	UpdateShaderMatrices();
+	quad->Draw();
 
 }

@@ -14,6 +14,9 @@ in Vertex {
 } IN;
 
 out vec4 fragColour;
+out vec2 texCoord;
+out vec3 normal;
+out vec3 worldPos;
 
 void main(void)	{
 	vec3 incident = normalize(lightPos - IN.worldPos);
