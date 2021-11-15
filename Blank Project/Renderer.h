@@ -32,6 +32,7 @@ protected:
 	Shader* lightShader;
 	Shader* reflectShader;
 	Shader* skyboxShader;
+	Shader* postProcess;
 
 	Camera* camera;
 
@@ -52,4 +53,5 @@ protected:
 	Light* sun;
 
 	float waterMov;
+	float waterRot;
 };

@@ -35,7 +35,7 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	//load heightmaps
 	heightmap = new HeightMap(TEXTUREDIR"islandMap.JPG");
 	if (!heightmap) { return; }
-	Vector3	heightmapSize = heightmap->GetHeightmapSize();
+	heightmapSize = heightmap->GetHeightmapSize();
 
 	//load camera
 	camera = new Camera(0.0f, 0.0f, heightmapSize * Vector3(0.5f, 0.5f, 0.5f));
@@ -58,7 +58,7 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	root->AddChild(new Island(cube));
 
 	//load lights
-	sun = new Light(heightmapSize * Vector3(0.5f, 1.5f, 0.5f), Vector4(1, 1, 1, 1), heightmapSize.x * 0.5f);
+	sun = new Light(heightmapSize * Vector3(0.5f, 1.0f, 0.5f), Vector4(1, 1, 1, 1), heightmapSize.x * 0.5f);
 
 	//PostProcessing Buffers
 
@@ -70,6 +70,7 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 
 	// Bools and such
 	waterMov = 0.1f;
+	waterRot = 0.0f;
 	init = true;
 }
 Renderer::~Renderer()	{
@@ -86,6 +87,9 @@ Renderer::~Renderer()	{
 void Renderer::UpdateScene(float dt) {
 	camera->UpdateCamera(dt);
 	viewMatrix = camera->BuildViewMatrix();
+
+	waterMov += dt * 0.025f;
+	waterRot += dt * 0.01f;
 }
 
 void Renderer::RenderScene()	{
@@ -94,7 +98,7 @@ void Renderer::RenderScene()	{
 
 	DrawSkyBox();
 	DrawHeightMap();
-	DrawNode(root);
+	//DrawNode(root);
 	DrawWater();
 	//renable culling etc
 }
@@ -117,7 +121,7 @@ void Renderer::DrawHeightMap() {
 	
 	glUniform3fv(glGetUniformLocation(lightShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
 
-	glUniform1i(glGetUniformLocation(basicShader->GetProgram(), "diffuseTex"), 0);
+	glUniform1i(glGetUniformLocation(lightShader->GetProgram(), "diffuseTex"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, sandTex);
 
@@ -155,22 +159,23 @@ void Renderer::DrawWater() {
 	glUniform3fv(glGetUniformLocation(reflectShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
 
 	glUniform1i(glGetUniformLocation(reflectShader->GetProgram(), "diffuseTex"), 0);
+	glUniform1i(glGetUniformLocation(reflectShader->GetProgram(), "cubeTex"), 2);
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, waterTex);
 
-	glUniform1i(glGetUniformLocation(reflectShader->GetProgram(), "cubeTex"), 2);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
 
 	modelMatrix =
-		Matrix4::Translation(heightmapSize * 0.5f) *
+		Matrix4::Translation(heightmapSize * Vector3(0.5f, 0.05f, 0.5f)) *
 		Matrix4::Scale(heightmapSize * 0.5f) *
 		Matrix4::Rotation(90, Vector3(1, 0, 0));
 
 	textureMatrix =
 		Matrix4::Translation(Vector3(waterMov, 0.0f, waterMov)) *
 		Matrix4::Scale(Vector3(10, 10, 10)) *
-		Matrix4::Rotation(0.0f, Vector3(0, 0, 1));
+		Matrix4::Rotation(waterRot, Vector3(0, 0, 1));
 
 	UpdateShaderMatrices();
 	quad->Draw();
