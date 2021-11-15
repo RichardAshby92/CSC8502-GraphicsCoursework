@@ -3,10 +3,13 @@
 #include "../nclgl/Camera.h"
 #include "../nclgl/HeightMap.h"
 #include "../nclgl/SceneNode.h"
+#include "../nclgl/Light.h"
+#include "../nclgl/Island.h"
 
 Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	//load meshses
 	quad = Mesh::GenerateQuad();
+	cube = Mesh::LoadFromMeshFile("OffsetCubeY.msh");
 
 	//load textures
 	//waterTex = SOIL_load_OGL_texture(TEXTUREDIR"water.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS); old texture not working? 
@@ -28,7 +31,6 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	SetTextureRepeating(waterTex, true);
 	SetTextureRepeating(sandTex, true);
 
-
 	//load heightmaps
 	heightmap = new HeightMap(TEXTUREDIR"islandMap.JPG");
 	if (!heightmap) { return; }
@@ -49,8 +51,12 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 
 	//load root
 	root = new SceneNode();
+	root->AddChild(new Island(cube));
 
 	//load lights
+	sun = new Light(heightmapSize * Vector3(0.5f, 1.5f, 0.5f), Vector4(1, 1, 1, 1), heightmapSize.x * 0.5f);
+
+	//PostProcessing
 
 	//GL States
 	glEnable(GL_DEPTH_TEST);
@@ -59,7 +65,7 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	// Bools and such
-	waterMov = 0.0f;
+	waterMov = 0.1f;
 	init = true;
 }
 Renderer::~Renderer()	{
@@ -68,6 +74,9 @@ Renderer::~Renderer()	{
 	//delete heightmaps
 	//delete camera
 	//delete shaders
+	//delete lights
+
+	//FBOs
 }
 
 void Renderer::UpdateScene(float dt) {
@@ -79,8 +88,11 @@ void Renderer::RenderScene()	{
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	//disable culling etc
 
-	DrawSkyBox();
+	//DrawSkyBox();
 	DrawHeightMap();
+
+
+
 	DrawNode(root);
 	DrawWater();
 	//renable culling etc
@@ -109,8 +121,25 @@ void Renderer::DrawHeightMap() {
 	heightmap->Draw();
 }
 
-void Renderer::DrawNode(SceneNode* n) {
+void Renderer::DrawLights() {
 
+	//BindShader();
+	SetShaderLight(*sun);
+}
+
+void Renderer::DrawNode(SceneNode* n) {
+	glBindTexture(GL_TEXTURE_2D, 0);
+	if (n->GetMesh()) {
+		Matrix4 model = n->GetWorldTransform() * Matrix4::Scale(n->GetModelScale());
+		glUniformMatrix4fv(glGetUniformLocation(basicShader->GetProgram(), "modelMatrix"), 1, false, model.values);
+		glUniform4fv(glGetUniformLocation(basicShader->GetProgram(), "nodeColour"), 1, (float*)& n->GetColour());
+		//glUniform1i(glGetUniformLocation(basicShader->GetProgram(), "useTexture"), n->GetTexture());
+		n->Draw(*this);
+	}
+
+	for (vector<SceneNode*>::const_iterator i = n->GetChildIteratorStart(); i != n->GetChildIteratorEnd(); ++i) {
+		DrawNode(*i);
+	}
 }
 
 void Renderer::DrawWater() {

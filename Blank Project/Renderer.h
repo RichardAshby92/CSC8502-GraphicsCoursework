@@ -5,6 +5,7 @@ class Camera;
 class Mesh;
 class HeightMap;
 class SceneNode;
+class Light;
 
 class Renderer : public OGLRenderer	{
 public:
@@ -17,12 +18,14 @@ protected:
 	
 	void DrawSkyBox();
 	void DrawHeightMap();
+	void DrawLights();
 	void DrawWater();
 	void DrawNode(SceneNode* n);
 
 	HeightMap* heightmap;
 
 	Mesh* quad;
+	Mesh* cube;
 
 	Shader* basicShader;
 	Shader* lightShader;
@@ -44,6 +47,8 @@ protected:
 	GLuint cubeMap;
 
 	SceneNode* root;
+
+	Light* sun;
 
 	float waterMov;
 };
