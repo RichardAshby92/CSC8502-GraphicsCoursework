@@ -58,7 +58,7 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	root->AddChild(new Island(cube));
 
 	//load lights
-	sun = new Light(heightmapSize * Vector3(0.5f, 1.0f, 0.5f), Vector4(1, 1, 1, 1), heightmapSize.x * 0.5f);
+	sun = new Light(heightmapSize * Vector3(0.7f, 3.0f, 0.20f), Vector4(1, 0.6, 0.0, 1), heightmapSize.x * 1.5f);
 
 	//PostProcessing Buffers
 
@@ -67,6 +67,8 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+
 
 	// Bools and such
 	waterMov = 0.1f;
@@ -98,7 +100,8 @@ void Renderer::RenderScene()	{
 
 	DrawSkyBox();
 	DrawHeightMap();
-	//DrawNode(root);
+	DrawNode(root);	
+
 	DrawWater();
 	//renable culling etc
 }
@@ -124,6 +127,14 @@ void Renderer::DrawHeightMap() {
 	glUniform1i(glGetUniformLocation(lightShader->GetProgram(), "diffuseTex"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, sandTex);
+
+	glUniform1i(glGetUniformLocation(lightShader->GetProgram(), "diffuseTex1"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, grassTex);
+
+	glUniform1i(glGetUniformLocation(lightShader->GetProgram(), "diffuseTex2"), 2);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, rockTex);
 
 	modelMatrix.ToIdentity();
 	textureMatrix.ToIdentity();

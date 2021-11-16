@@ -1,6 +1,9 @@
 #version 330 core
 
 uniform sampler2D diffuseTex;
+uniform sampler2D diffuseTex1;
+uniform sampler2D diffuseTex2;
+
 uniform vec3 cameraPos;
 uniform vec4 lightColour;
 uniform vec3 lightPos;
@@ -23,8 +26,18 @@ void main(void)	{
 	vec3 viewDir = normalize(cameraPos - IN.worldPos);
 	vec3 halfDir = normalize(incident + viewDir);
 	
-	vec4 diffuse = texture(diffuseTex, IN.texCoord);
-	
+	vec4 diffuse;
+	if(IN.worldPos.y <= 40.0f) {
+		diffuse = texture(diffuseTex, IN.texCoord);
+	}
+	else if(IN.worldPos.y > 40.0f && IN.worldPos.y < 200.0f){
+		diffuse = texture(diffuseTex1, IN.texCoord);
+	}
+	else if(IN.worldPos.y >= 200.0f){
+		diffuse = texture(diffuseTex2, IN.texCoord);
+	}
+
+
 	float lambert = max(dot(incident, IN.normal), 0.0f);
 	float distance = length(lightPos - IN.worldPos);
 	float attenuation = 1.0 - clamp(distance / lightRadius, 0.0, 1.0);
