@@ -55,7 +55,7 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 
 	//load root
 	root = new SceneNode();
-	root->AddChild(new Island(cube));
+	root->AddChild(new Island());
 
 	//load lights
 	sun = new Light(heightmapSize * Vector3(0.7f, 3.0f, 0.20f), Vector4(1, 0.6, 0.0, 1), heightmapSize.x * 1.5f);
@@ -89,6 +89,7 @@ Renderer::~Renderer()	{
 void Renderer::UpdateScene(float dt) {
 	camera->UpdateCamera(dt);
 	viewMatrix = camera->BuildViewMatrix();
+	root->Update(dt);
 
 	waterMov += dt * 0.025f;
 	waterRot += dt * 0.01f;
@@ -102,7 +103,7 @@ void Renderer::RenderScene()	{
 	DrawHeightMap();
 	DrawNode(root);	
 
-	DrawWater();
+	//DrawWater();
 	//renable culling etc
 }
 
@@ -119,7 +120,7 @@ void Renderer::DrawSkyBox() {
 }
 
 void Renderer::DrawHeightMap() {
-	BindShader(lightShader); //change later
+	BindShader(lightShader);
 	SetShaderLight(*sun);
 	
 	glUniform3fv(glGetUniformLocation(lightShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
@@ -143,19 +144,20 @@ void Renderer::DrawHeightMap() {
 	heightmap->Draw();
 }
 
-void Renderer::DrawLights() {
-
-	//BindShader();
-	SetShaderLight(*sun);
-}
-
 void Renderer::DrawNode(SceneNode* n) {
 	glBindTexture(GL_TEXTURE_2D, 0);
 	if (n->GetMesh()) {
-		Matrix4 model = n->GetWorldTransform() * Matrix4::Scale(n->GetModelScale());
-		glUniformMatrix4fv(glGetUniformLocation(basicShader->GetProgram(), "modelMatrix"), 1, false, model.values);
+		BindShader(basicShader);
+		UpdateShaderMatrices();
+
+		//Matrix4 model = n->GetWorldTransform() * Matrix4::Scale(n->GetModelScale());
+		glUniformMatrix4fv(glGetUniformLocation(basicShader->GetProgram(), "modelMatrix"), 1, false, (float*)&camera->GetPosition());
 		glUniform4fv(glGetUniformLocation(basicShader->GetProgram(), "nodeColour"), 1, (float*)& n->GetColour());
-		//glUniform1i(glGetUniformLocation(basicShader->GetProgram(), "useTexture"), n->GetTexture());
+		
+		glUniform1i(glGetUniformLocation(basicShader->GetProgram(), "diffuseTex"), 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, waterTex);
+
 		n->Draw(*this);
 	}
 

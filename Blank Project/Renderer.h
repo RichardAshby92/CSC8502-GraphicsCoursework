@@ -6,6 +6,7 @@ class Mesh;
 class HeightMap;
 class SceneNode;
 class Light;
+class Island;
 
 class Renderer : public OGLRenderer	{
 public:
@@ -49,6 +50,7 @@ protected:
 	GLuint cubeMap;
 
 	SceneNode* root;
+	Island* island;
 
 	Light* sun;
 
