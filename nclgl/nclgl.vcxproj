@@ -28,6 +28,7 @@
     <ClCompile Include="Island.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Light.cpp" />
+    <ClCompile Include="Markers.cpp" />
     <ClCompile Include="Matrix2.cpp" />
     <ClCompile Include="Matrix3.cpp" />
     <ClCompile Include="Matrix4.cpp" />
@@ -36,6 +37,7 @@
     <ClCompile Include="MeshMaterial.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="OGLRenderer.cpp" />
+    <ClCompile Include="Plants.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="SceneNode.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -52,6 +54,7 @@
     <ClInclude Include="Island.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="Markers.h" />
     <ClInclude Include="Matrix2.h" />
     <ClInclude Include="Matrix3.h" />
     <ClInclude Include="Matrix4.h" />
@@ -60,6 +63,7 @@
     <ClInclude Include="MeshMaterial.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="OGLRenderer.h" />
+    <ClInclude Include="Plants.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="SceneNode.h" />
     <ClInclude Include="Shader.h" />

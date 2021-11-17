@@ -36,8 +36,18 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="SceneNode.cpp" />
     <ClCompile Include="Light.cpp" />
-    <ClCompile Include="CubeRobot.cpp" />
-    <ClCompile Include="Island.cpp" />
+    <ClCompile Include="Island.cpp">
+      <Filter>SceneTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeRobot.cpp">
+      <Filter>SceneTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="Markers.cpp">
+      <Filter>SceneTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="Plants.cpp">
+      <Filter>SceneTypes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />
@@ -85,8 +95,18 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="SceneNode.h" />
     <ClInclude Include="Light.h" />
-    <ClInclude Include="CubeRobot.h" />
-    <ClInclude Include="Island.h" />
+    <ClInclude Include="Island.h">
+      <Filter>SceneTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeRobot.h">
+      <Filter>SceneTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Markers.h">
+      <Filter>SceneTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Plants.h">
+      <Filter>SceneTypes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GLAD">
@@ -97,6 +117,9 @@
     </Filter>
     <Filter Include="Windows and Input">
       <UniqueIdentifier>{4a13117a-c481-4385-bd9e-1acd65146a21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneTypes">
+      <UniqueIdentifier>{2c15326d-3af5-43c2-aabb-b8f1eb9d6791}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
