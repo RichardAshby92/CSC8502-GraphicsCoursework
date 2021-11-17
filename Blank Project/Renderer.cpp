@@ -6,6 +6,7 @@
 #include "../nclgl/Light.h"
 #include "../nclgl/Island.h"
 #include "../nclgl/Shader.h"
+#include "../nclgl/CubeRobot.h"
 
 Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	//load meshses
@@ -43,19 +44,22 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	//othographic projmatrix here
 
 	//load shaders
-	basicShader = new Shader("TexturedVertex.glsl", "TexturedFragment.glsl");
+	sceneShader = new Shader("SceneVertex.glsl", "SceneFragment.glsl");
 	skyboxShader = new Shader("skyboxVertex.glsl", "skyboxFragment.glsl");
 	reflectShader = new Shader("reflectVertex.glsl", "reflectFragment.glsl");
 	lightShader = new Shader("PerPixelVertex.glsl", "PerPixelFragment.glsl");
 
-	if (!basicShader->LoadSuccess()) { return; }
+	if (!sceneShader->LoadSuccess()) { return; }
 	if (!skyboxShader->LoadSuccess()) { return; } 
 	if (!reflectShader->LoadSuccess()) {return;} 
 	if (!lightShader->LoadSuccess()) { return; }
 
 	//load root
 	root = new SceneNode();
-	root->AddChild(new Island());
+	Island* s = new Island();
+	s->SetTransform(Matrix4::Translation(heightmapSize * Vector3(0.5f, 0.5f, 0.5f )));
+	s->SetModelScale(Vector3(100.0f, 100.0f, 100.0f));
+	root->AddChild(s);
 
 	//load lights
 	sun = new Light(heightmapSize * Vector3(0.7f, 3.0f, 0.20f), Vector4(1, 0.6, 0.0, 1), heightmapSize.x * 1.5f);
@@ -67,8 +71,6 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-
-
 
 	// Bools and such
 	waterMov = 0.1f;
@@ -101,9 +103,10 @@ void Renderer::RenderScene()	{
 
 	DrawSkyBox();
 	DrawHeightMap();
+
 	DrawNode(root);	
 
-	//DrawWater();
+	DrawWater();
 	//renable culling etc
 }
 
@@ -147,16 +150,19 @@ void Renderer::DrawHeightMap() {
 void Renderer::DrawNode(SceneNode* n) {
 	glBindTexture(GL_TEXTURE_2D, 0);
 	if (n->GetMesh()) {
-		BindShader(basicShader);
+		BindShader(sceneShader);
 		UpdateShaderMatrices();
 
-		//Matrix4 model = n->GetWorldTransform() * Matrix4::Scale(n->GetModelScale());
-		glUniformMatrix4fv(glGetUniformLocation(basicShader->GetProgram(), "modelMatrix"), 1, false, (float*)&camera->GetPosition());
-		glUniform4fv(glGetUniformLocation(basicShader->GetProgram(), "nodeColour"), 1, (float*)& n->GetColour());
+		Matrix4 model = n->GetWorldTransform() * Matrix4::Scale(n->GetModelScale());
+		glUniformMatrix4fv(glGetUniformLocation(sceneShader->GetProgram(), "modelMatrix"), 1, false, model.values);
+		glUniform4fv(glGetUniformLocation(sceneShader->GetProgram(), "nodeColour"), 1, (float*)& n->GetColour());
+		glUniform1i(glGetUniformLocation(sceneShader->GetProgram(), "useTexture"), n->GetTexture());
 		
-		glUniform1i(glGetUniformLocation(basicShader->GetProgram(), "diffuseTex"), 0);
+		glUniform1i(glGetUniformLocation(sceneShader->GetProgram(), "diffuseTex"), 0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, waterTex);
+
+		
 
 		n->Draw(*this);
 	}
@@ -182,7 +188,7 @@ void Renderer::DrawWater() {
 
 	modelMatrix =
 		Matrix4::Translation(heightmapSize * Vector3(0.5f, 0.05f, 0.5f)) *
-		Matrix4::Scale(heightmapSize * 0.5f) *
+		Matrix4::Scale(heightmapSize * 1.0f) *
 		Matrix4::Rotation(90, Vector3(1, 0, 0));
 
 	textureMatrix =

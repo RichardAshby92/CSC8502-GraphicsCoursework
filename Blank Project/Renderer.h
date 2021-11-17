@@ -29,6 +29,7 @@ protected:
 	Mesh* quad;
 	Mesh* cube;
 
+	Shader* sceneShader;
 	Shader* basicShader;
 	Shader* lightShader;
 	Shader* reflectShader;
