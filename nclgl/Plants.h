@@ -1,8 +1,8 @@
 #pragma once
-#pragma once
 #include "../nclgl/SceneNode.h"
 
 class Mesh;
+class MeshMaterial;
 
 class Plants : public SceneNode {
 public:
@@ -17,5 +17,8 @@ protected:
 
 	Mesh* plant;
 
+	MeshMaterial* plantMat;
+
+	vector<GLuint> plantTextures;
 };
 

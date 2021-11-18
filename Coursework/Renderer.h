@@ -3,6 +3,7 @@
 
 class Camera;
 class Mesh;
+class MeshMaterial;
 class HeightMap;
 class SceneNode;
 class Light;
@@ -19,7 +20,6 @@ protected:
 	
 	void DrawSkyBox();
 	void DrawHeightMap();
-	void DrawLights();
 	void DrawWater();
 	void DrawNode(SceneNode* n);
 
@@ -29,6 +29,10 @@ protected:
 	Mesh* quad;
 	Mesh* cube;
 	Mesh* plant;
+
+	MeshMaterial* plantMat;
+
+	vector<GLuint> plantTextures;
 
 	Shader* sceneShader;
 	Shader* basicShader;
@@ -58,4 +62,6 @@ protected:
 
 	float waterMov;
 	float waterRot;
+
+	bool autoCam;
 };

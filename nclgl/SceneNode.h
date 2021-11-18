@@ -17,6 +17,9 @@ public:
 	void SetTexture(GLuint tex) { texture = tex; }
 	GLuint GetTexture() const { return texture; }
 
+	void SetSubTextures(vector<GLuint> tex) { subTextures = tex; }
+	vector<GLuint> GetSubTextures() const { return subTextures; }
+
 	void SetTransform(const Matrix4& matrix) { transform = matrix; }
 	const Matrix4& GetTransform() const { return transform; }
 	Matrix4 GetWorldTransform() const { return worldTransform; }
@@ -50,5 +53,6 @@ protected:
 	float distanceFromCamera;
 	float boundingRadius;
 	GLuint texture;
+	std::vector<GLuint> subTextures;
 
 };

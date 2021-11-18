@@ -5,6 +5,7 @@
 #include "../nclgl/SceneNode.h"
 #include "../nclgl/Light.h"
 #include "../nclgl/Shader.h"
+#include "../nclgl/MeshMaterial.h"
 
 #include "../nclgl/CubeRobot.h"
 #include "../nclgl/Island.h"
@@ -15,10 +16,9 @@
 Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	//load meshses
 	quad = Mesh::GenerateQuad();
-	plant = Mesh::LoadFromMeshFile("PalmTreeSingleStraightOneSided.msh");
+	//plant = Mesh::LoadFromMeshFile("P_Bush01.msh");
 
 	//load textures
-	//waterTex = SOIL_load_OGL_texture(TEXTUREDIR"water.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS); old texture not working? 
 	waterTex = SOIL_load_OGL_texture(TEXTUREDIR"water.TGA", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
 	sandTex = SOIL_load_OGL_texture(TEXTUREDIR"sand.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
 	rockTex = SOIL_load_OGL_texture(TEXTUREDIR"rock.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
@@ -60,10 +60,11 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 
 	//load root
 	root = new SceneNode();
-	Markers* s = new Markers(heightmapSize);
-	root->AddChild(s);
 	Plants* p = new Plants(heightmapSize);
 	root->AddChild(p);
+	Markers* s = new Markers(heightmapSize);
+	root->AddChild(s);
+
 
 
 	//load lights
@@ -80,6 +81,8 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	// Bools and such
 	waterMov = 0.1f;
 	waterRot = 0.0f;
+
+	autoCam = true;
 	init = true;
 }
 Renderer::~Renderer()	{
@@ -162,14 +165,18 @@ void Renderer::DrawNode(SceneNode* n) {
 		glUniformMatrix4fv(glGetUniformLocation(sceneShader->GetProgram(), "modelMatrix"), 1, false, model.values);
 		glUniform4fv(glGetUniformLocation(sceneShader->GetProgram(), "nodeColour"), 1, (float*)& n->GetColour());
 		glUniform1i(glGetUniformLocation(sceneShader->GetProgram(), "useTexture"), n->GetTexture());
-		
-		glUniform1i(glGetUniformLocation(sceneShader->GetProgram(), "diffuseTex"), 0);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, waterTex);
 
-		
+		if(n->GetMesh()->GetSubMeshCount() > 1){
+			for (int i = 0; i < n->GetMesh()->GetSubMeshCount(); ++i)
+			{
+				std::vector<GLuint> temp = n->GetSubTextures();
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, temp[i]);
+				n->GetMesh()->DrawSubMesh(i);
+			}
+		}
+		else{ n->Draw(*this); }
 
-		n->Draw(*this);
 	}
 
 	for (vector<SceneNode*>::const_iterator i = n->GetChildIteratorStart(); i != n->GetChildIteratorEnd(); ++i) {

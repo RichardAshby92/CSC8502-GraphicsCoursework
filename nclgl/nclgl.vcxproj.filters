@@ -4,7 +4,6 @@
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshAnimation.cpp" />
-    <ClCompile Include="MeshMaterial.cpp" />
     <ClCompile Include="OGLRenderer.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="..\Third Party\glad\glad.c">
@@ -48,13 +47,13 @@
     <ClCompile Include="Plants.cpp">
       <Filter>SceneTypes</Filter>
     </ClCompile>
+    <ClCompile Include="MeshMaterial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshAnimation.h" />
-    <ClInclude Include="MeshMaterial.h" />
     <ClInclude Include="OGLRenderer.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ComputeShader.h" />
@@ -107,6 +106,7 @@
     <ClInclude Include="Plants.h">
       <Filter>SceneTypes</Filter>
     </ClInclude>
+    <ClInclude Include="MeshMaterial.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GLAD">
