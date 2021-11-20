@@ -6,6 +6,7 @@
 #include "../nclgl/Light.h"
 #include "../nclgl/Shader.h"
 #include "../nclgl/MeshMaterial.h"
+#include "../nclgl/Particle.h"
 
 #include "../nclgl/CubeRobot.h"
 #include "../nclgl/Island.h"
@@ -23,6 +24,7 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	sandTex = SOIL_load_OGL_texture(TEXTUREDIR"sand.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
 	rockTex = SOIL_load_OGL_texture(TEXTUREDIR"rock.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
 	grassTex = SOIL_load_OGL_texture(TEXTUREDIR"grass2.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
+	rainTex = SOIL_load_OGL_texture(TEXTUREDIR"Rain Drop.PNG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
 
 	waterBump = SOIL_load_OGL_texture(TEXTUREDIR"Barren RedsDOT3.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
 	sandBump = SOIL_load_OGL_texture(TEXTUREDIR"Barren RedsDOT3.JPG", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS);
@@ -32,7 +34,7 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	cubeMap = SOIL_load_OGL_cubemap(TEXTUREDIR"yellowcloud_ft.JPG", TEXTUREDIR"yellowcloud_bk.JPG", TEXTUREDIR"yellowcloud_up.JPG",
 		TEXTUREDIR"yellowcloud_dn.JPG", TEXTUREDIR"yellowcloud_rt.JPG", TEXTUREDIR"yellowcloud_lf.JPG", SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, 0);
 
-	if (!waterTex || !sandTex || !rockTex || !grassTex || !cubeMap ) { return; }
+	if (!waterTex || !sandTex || !rockTex || !grassTex || !cubeMap || !rainTex ) { return; } //check all checks are in place
 
 	SetTextureRepeating(waterTex, true);
 	SetTextureRepeating(sandTex, true);
@@ -43,7 +45,8 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	heightmapSize = heightmap->GetHeightmapSize();
 
 	//load camera
-	camera = new Camera(0.0f, 0.0f, heightmapSize * Vector3(0.3f, 0.5f, 0.65f));
+	camera = new Camera(0.0f, 0.0f, heightmapSize * Vector3(0.3f, 0.2f, 0.65f));
+
 	projMatrix = Matrix4::Perspective(1.0f, 15000.0f, (float)width / (float)height, 45.0f);
 	//othographic projmatrix here
 
@@ -51,12 +54,12 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	sceneShader = new Shader("SceneVertex.glsl", "SceneFragment.glsl");
 	skyboxShader = new Shader("skyboxVertex.glsl", "skyboxFragment.glsl");
 	reflectShader = new Shader("reflectVertex.glsl", "reflectFragment.glsl");
-	lightShader = new Shader("PerPixelVertex.glsl", "PerPixelFragment.glsl");
+	terrainShader = new Shader("TerrainVertex.glsl", "TerrainFragment.glsl");
 
 	if (!sceneShader->LoadSuccess()) { return; }
 	if (!skyboxShader->LoadSuccess()) { return; } 
 	if (!reflectShader->LoadSuccess()) {return;} 
-	if (!lightShader->LoadSuccess()) { return; }
+	if (!terrainShader->LoadSuccess()) { return; }
 
 	//load root
 	root = new SceneNode();
@@ -65,7 +68,8 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	Markers* s = new Markers(heightmapSize);
 	root->AddChild(s);
 
-
+	//load particle effects
+	rain = new ParticleControl(heightmapSize);
 
 	//load lights
 	sun = new Light(heightmapSize * Vector3(0.0f, 5.0f, 0.55f), Vector4(1, 0.6, 0.0, 1), heightmapSize.x * 1.5f);
@@ -82,7 +86,7 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	waterMov = 0.1f;
 	waterRot = 0.0f;
 
-	autoCam = true;
+	autoCam = false;
 	init = true;
 }
 Renderer::~Renderer()	{
@@ -97,9 +101,10 @@ Renderer::~Renderer()	{
 }
 
 void Renderer::UpdateScene(float dt) {
-	camera->UpdateCamera(dt);
+	camera->UpdateCamera(autoCam, dt);
 	viewMatrix = camera->BuildViewMatrix();
 	root->Update(dt);
+	rain->Update(dt);
 
 	waterMov += dt * 0.025f;
 	waterRot += dt * 0.01f;
@@ -114,7 +119,9 @@ void Renderer::RenderScene()	{
 
 	DrawNode(root);	
 
+	DrawRain(rain);
 	DrawWater();
+
 	//renable culling etc
 }
 
@@ -131,20 +138,20 @@ void Renderer::DrawSkyBox() {
 }
 
 void Renderer::DrawHeightMap() {
-	BindShader(lightShader);
+	BindShader(terrainShader);
 	SetShaderLight(*sun);
 	
-	glUniform3fv(glGetUniformLocation(lightShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
+	glUniform3fv(glGetUniformLocation(terrainShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
 
-	glUniform1i(glGetUniformLocation(lightShader->GetProgram(), "diffuseTex"), 0);
+	glUniform1i(glGetUniformLocation(terrainShader->GetProgram(), "diffuseTex"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, sandTex);
 
-	glUniform1i(glGetUniformLocation(lightShader->GetProgram(), "diffuseTex1"), 1);
+	glUniform1i(glGetUniformLocation(terrainShader->GetProgram(), "diffuseTex1"), 1);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, grassTex);
 
-	glUniform1i(glGetUniformLocation(lightShader->GetProgram(), "diffuseTex2"), 2);
+	glUniform1i(glGetUniformLocation(terrainShader->GetProgram(), "diffuseTex2"), 2);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, rockTex);
 
@@ -211,4 +218,28 @@ void Renderer::DrawWater() {
 	UpdateShaderMatrices();
 	quad->Draw();
 
+}
+
+void Renderer::DrawRain(ParticleControl* rain) {
+	glBindTexture(GL_TEXTURE_2D, 0);
+	
+	BindShader(sceneShader);
+	UpdateShaderMatrices();
+
+	for (int i = 0; i < rain->GetParticleAmount(); ++i) {
+		Matrix4 model = Matrix4::Translation(rain->GetWorldTransform()[i]) * Matrix4::Scale(rain->GetModelScale());
+		glUniformMatrix4fv(glGetUniformLocation(sceneShader->GetProgram(), "modelMatrix"), 1, false, model.values);
+
+		glUniform1i(glGetUniformLocation(sceneShader->GetProgram(), "diffuseTex"), 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, rainTex);
+
+		rain->Draw();
+	}
+}
+
+void Renderer::toggleAutoCam() {
+	autoCam = !autoCam;
+	camera->SetPosition(heightmapSize * Vector3(0.3f, 0.2f, 0.65f));
+	camera->SetYaw(0.0f);
 }

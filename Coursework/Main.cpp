@@ -25,6 +25,10 @@ int main()	{
 			Shader::ReloadAllShaders();
 		}
 
+		if (Window::GetKeyboard()->KeyDown(KEYBOARD_P)) {
+			renderer.toggleAutoCam();
+		}
+
 		//Controls added here
 	}
 	return 0;

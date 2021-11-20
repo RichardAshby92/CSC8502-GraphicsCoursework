@@ -6,13 +6,19 @@ Markers::Markers(Vector3 heightmapSize) {
 	//markers
 	Mesh* cube = Mesh::LoadFromMeshFile("OffsetCubeY.msh");
 
-	marker = new SceneNode(cube, Vector4(1, 0, 0, 1)); //camera
-	marker->SetModelScale(Vector3(10, 10, 10));
-	marker->SetTransform(Matrix4::Translation(heightmapSize * Vector3(0.3f, 0.5f, 0.65f)));
-	//marker->SetColour(Vector4(1, 0, 0, 1));
-	marker->SetTexture(0);
-	marker->SetBoundingRadius(1);
-	AddChild(marker);
+	camStart = new SceneNode(cube, Vector4(1, 0, 0, 1)); //camera
+	camStart->SetModelScale(Vector3(10, 10, 10));
+	camStart->SetTransform(Matrix4::Translation(heightmapSize * Vector3(0.3f, 0.2f, 0.65f)));
+	camStart->SetTexture(0);
+	camStart->SetBoundingRadius(1);
+	AddChild(camStart);
+
+	camEnd = new SceneNode(cube, Vector4(1, 0, 0, 1)); //cam marker
+	camEnd->SetModelScale(Vector3(10, 10, 10));
+	camEnd->SetTransform(Matrix4::Translation(heightmapSize * Vector3(0.6f, 1.5f, 0.35f)));
+	camEnd->SetTexture(0);
+	camEnd->SetBoundingRadius(1);
+	AddChild(camEnd);
 
 	marker1 = new SceneNode(cube, Vector4(1, 0, 0, 1)); //Top Left
 	marker1->SetModelScale(Vector3(10, 10, 10));
@@ -54,9 +60,13 @@ Markers::Markers(Vector3 heightmapSize) {
 	marker4->SetBoundingRadius(1);
 	AddChild(marker4);
 
+
+
 }
 
 void Markers::Update(float dt) {
 
 	SceneNode::Update(dt);
 }
+
+Vector3 GetCameraPos();

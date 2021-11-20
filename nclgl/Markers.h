@@ -9,8 +9,12 @@ public:
 	~Markers() {};
 
 	void Update(float dt) override;
+	Vector3 GetCameraPos();
 
 protected:
+	SceneNode* camStart;
+	SceneNode* camEnd;
+
 	SceneNode* marker;
 	SceneNode* marker1;
 	SceneNode* marker2;
@@ -18,5 +22,5 @@ protected:
 	SceneNode* marker4;
 
 	Mesh* cube;
-	
+
 };

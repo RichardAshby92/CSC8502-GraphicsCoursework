@@ -8,6 +8,7 @@ class HeightMap;
 class SceneNode;
 class Light;
 class Island;
+class ParticleControl;
 
 class Renderer : public OGLRenderer	{
 public:
@@ -16,12 +17,16 @@ public:
 	 
 	 void RenderScene()			override;
 	 void UpdateScene(float dt)	override;
+
+	 void toggleAutoCam();
 protected:
 	
 	void DrawSkyBox();
 	void DrawHeightMap();
-	void DrawWater();
 	void DrawNode(SceneNode* n);
+	void DrawWater();
+	void DrawRain(ParticleControl* rain);
+
 
 	HeightMap* heightmap;
 	Vector3	heightmapSize;
@@ -36,17 +41,20 @@ protected:
 
 	Shader* sceneShader;
 	Shader* basicShader;
-	Shader* lightShader;
+	Shader* terrainShader;
 	Shader* reflectShader;
 	Shader* skyboxShader;
 	Shader* postProcess;
 
 	Camera* camera;
 
+	ParticleControl* rain;
+
 	GLuint sandTex;
 	GLuint waterTex;
 	GLuint rockTex;
 	GLuint grassTex;
+	GLuint rainTex;
 
 	GLuint sandBump;
 	GLuint waterBump;

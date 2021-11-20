@@ -48,6 +48,7 @@
       <Filter>SceneTypes</Filter>
     </ClCompile>
     <ClCompile Include="MeshMaterial.cpp" />
+    <ClCompile Include="Particle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />
@@ -107,6 +108,7 @@
       <Filter>SceneTypes</Filter>
     </ClInclude>
     <ClInclude Include="MeshMaterial.h" />
+    <ClInclude Include="Particle.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GLAD">

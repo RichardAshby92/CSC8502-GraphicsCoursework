@@ -9,15 +9,11 @@ public:
 		pitch = 0.0f;
 	};
 	
-	Camera(float pitch, float yaw, Vector3 position) {
-		this->pitch = pitch;
-		this->yaw = yaw;
-		this->position = position;
-	}
+	Camera(float pitch, float yaw, Vector3 position);
 
 	~Camera(void) {};
 
-	void UpdateCamera(float dt = 1.0f);
+	void UpdateCamera( bool autoCam, float dt = 1.0f );
 
 	Matrix4 BuildViewMatrix();
 
@@ -34,4 +30,9 @@ protected:
 	float yaw;
 	float pitch;
 	Vector3 position;
+
+	float by;
+
+	Vector3 start = Vector3(7984.0f * 0.3f, 255.0f * 0.2f, 7984.0f * 0.65f);
+	Vector3 end = Vector3(7984.0f * 0.6f, 255.0f * 1.5f, 7984.0f * 0.35f);
 };
