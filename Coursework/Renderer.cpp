@@ -82,6 +82,9 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+
 	// Bools and such
 	waterMov = 0.1f;
 	waterRot = 0.0f;

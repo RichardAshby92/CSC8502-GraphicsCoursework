@@ -28,8 +28,7 @@ public:
 protected:
 	float particleSpeed;
 	float particleLife;
-	//float particleSize;
-	const static int particleAmount = 1000;
+	const static int particleAmount = 500;
 
 	Particle* p[particleAmount];
 

@@ -3,17 +3,18 @@
 ParticleControl::ParticleControl(Vector3 heightmapSize) {
 	particleSpeed = 10.0f;
 	particleLife = 100.0f;
-	particleScale = Vector3(1, 1, 1);
+	particleScale = Vector3(0.5, 0.5, 0.5);
 	particleColour = Vector4(0.2, 0.2, 0.2, 1);
 	GLuint particleTexture = 0;
 
 	for (int i = 0; i < particleAmount; ++i) {
 			
 		float posX = rand() % 6000 + 2000;
-		float posY = rand() % 6000 + 2000;
+		float posY = rand() % 55 + 255;
+		float posZ = rand() % 6000 + 2000;
 
 		p[i] = new Particle;
-		p[i]->particlePosition = Vector3(posX, 255, posY);
+		p[i]->particlePosition = Vector3(posX, posY, posZ);
 		p[i]->particleDirection = Vector3(0, -1, 0);
 		p[i]->particleMesh = Mesh::GenerateQuad();
 	}
