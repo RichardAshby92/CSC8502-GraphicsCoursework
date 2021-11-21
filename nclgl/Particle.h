@@ -7,8 +7,6 @@
 struct Particle {
 
 	Vector3 particlePosition;
-	Vector3 particleDirection;
-	Mesh* particleMesh;
 };
 
 class ParticleControl : public Mesh {
@@ -23,15 +21,24 @@ public:
 	Vector3 GetModelScale();
 	int GetParticleAmount() { return particleAmount; }
 
+	int FindUnusedParticles();
+	
 	void ResetParticle();
+	bool cmpr(float a, float b, float c) { return fabs(a - b) < c; }
 
 protected:
-	float particleSpeed;
-	float particleLife;
 	const static int particleAmount = 500;
 
-	Particle* p[particleAmount];
+	GLuint vertexBuffer;
+	GLuint positionBuffer;
+	GLuint colourBuffer;
 
+	Particle* ParticleContainer[particleAmount];
+
+	int lastParticle;
+
+	Vector4 particleColour;
+	Vector3 particleSpeed;
 	Vector3 particleScale;
 	Vector3 particleOrigin[particleAmount];
 	Vector4 particleColour;

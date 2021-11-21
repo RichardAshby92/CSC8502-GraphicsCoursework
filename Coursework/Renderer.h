@@ -45,6 +45,7 @@ protected:
 	Shader* reflectShader;
 	Shader* skyboxShader;
 	Shader* postProcess;
+	Shader* rainShader;
 
 	Camera* camera;
 

@@ -55,11 +55,13 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	skyboxShader = new Shader("skyboxVertex.glsl", "skyboxFragment.glsl");
 	reflectShader = new Shader("reflectVertex.glsl", "reflectFragment.glsl");
 	terrainShader = new Shader("TerrainVertex.glsl", "TerrainFragment.glsl");
+	rainShader = new Shader("RainVertex.glsl","RainFragment.glsl");
 
 	if (!sceneShader->LoadSuccess()) { return; }
 	if (!skyboxShader->LoadSuccess()) { return; } 
 	if (!reflectShader->LoadSuccess()) {return;} 
 	if (!terrainShader->LoadSuccess()) { return; }
+	if (!rainShader->LoadSuccess()) { return; }
 
 	//load root
 	root = new SceneNode();
@@ -81,9 +83,8 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-
 	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	glCullFace(GL_FRONT);
 
 	// Bools and such
 	waterMov = 0.1f;
@@ -118,11 +119,14 @@ void Renderer::RenderScene()	{
 	//disable culling etc
 
 	DrawSkyBox();
+
+
+
 	DrawHeightMap();
 
 	DrawNode(root);	
 
-	DrawRain(rain);
+	//DrawRain(rain);
 	DrawWater();
 
 	//renable culling etc

@@ -26,6 +26,8 @@ public:
 	float GetPitch() const { return pitch; }
 	void SetPitch(float p) { pitch = p; }
 
+	bool cmpr(float a, float b, float c) { return fabs(a - b) < c; }
+
 protected:
 	float yaw;
 	float pitch;

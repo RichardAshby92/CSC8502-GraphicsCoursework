@@ -26,7 +26,7 @@ void Camera::UpdateCamera(bool autoCam, float dt) {
 		yaw -= 360.0f;
 	}
 
-	float speed = 60.0f * dt;
+	float speed = 120.0f * dt;
 	float rotSpeed = 30.0f * dt;
 	//pick way points
 
@@ -38,7 +38,9 @@ void Camera::UpdateCamera(bool autoCam, float dt) {
 
 	if(autoCam){
 		Vector3 travel = end - start;
-		if (position == end) { return; }
+		if (cmpr(end.x, position.x, 1.0f)) { 
+			autoCam = false;  
+			return; }
 		travel.Normalise();
 
 		position += travel * speed;
