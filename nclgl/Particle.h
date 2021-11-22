@@ -23,11 +23,11 @@ public:
 
 	int FindUnusedParticles();
 	
-	void ResetParticle();
+	void ResetParticle(int i);
 	bool cmpr(float a, float b, float c) { return fabs(a - b) < c; }
 
 protected:
-	const static int particleAmount = 500;
+	const static int particleAmount = 10000;
 
 	GLuint vertexBuffer;
 	GLuint positionBuffer;
@@ -37,7 +37,6 @@ protected:
 
 	int lastParticle;
 
-	Vector4 particleColour;
 	Vector3 particleSpeed;
 	Vector3 particleScale;
 	Vector3 particleOrigin[particleAmount];

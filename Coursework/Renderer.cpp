@@ -55,13 +55,13 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	skyboxShader = new Shader("skyboxVertex.glsl", "skyboxFragment.glsl");
 	reflectShader = new Shader("reflectVertex.glsl", "reflectFragment.glsl");
 	terrainShader = new Shader("TerrainVertex.glsl", "TerrainFragment.glsl");
-	rainShader = new Shader("RainVertex.glsl","RainFragment.glsl");
+	//rainShader = new Shader("RainVertex.glsl","RainFragment.glsl");
 
 	if (!sceneShader->LoadSuccess()) { return; }
 	if (!skyboxShader->LoadSuccess()) { return; } 
 	if (!reflectShader->LoadSuccess()) {return;} 
 	if (!terrainShader->LoadSuccess()) { return; }
-	if (!rainShader->LoadSuccess()) { return; }
+	//if (!rainShader->LoadSuccess()) { return; }
 
 	//load root
 	root = new SceneNode();
@@ -83,8 +83,8 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
 
 	// Bools and such
 	waterMov = 0.1f;
@@ -100,6 +100,7 @@ Renderer::~Renderer()	{
 	//delete camera
 	//delete shaders
 	//delete lights
+	//delete particle effects
 
 	//FBOs
 }
@@ -126,7 +127,7 @@ void Renderer::RenderScene()	{
 
 	DrawNode(root);	
 
-	//DrawRain(rain);
+	DrawRain(rain);
 	DrawWater();
 
 	//renable culling etc
@@ -233,16 +234,16 @@ void Renderer::DrawRain(ParticleControl* rain) {
 	BindShader(sceneShader);
 	UpdateShaderMatrices();
 
-	for (int i = 0; i < rain->GetParticleAmount(); ++i) {
-		Matrix4 model = Matrix4::Translation(rain->GetWorldTransform()[i]) * Matrix4::Scale(rain->GetModelScale());
-		glUniformMatrix4fv(glGetUniformLocation(sceneShader->GetProgram(), "modelMatrix"), 1, false, model.values);
+	
+	//Matrix4 model = Matrix4::Translation(rain->GetWorldTransform()[i]) * Matrix4::Scale(rain->GetModelScale());
+	//glUniformMatrix4fv(glGetUniformLocation(sceneShader->GetProgram(), "modelMatrix"), 1, false, model.values);
 
-		glUniform1i(glGetUniformLocation(sceneShader->GetProgram(), "diffuseTex"), 0);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, rainTex);
+	glUniform1i(glGetUniformLocation(sceneShader->GetProgram(), "diffuseTex"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, rainTex);
 
-		rain->Draw();
-	}
+	rain->Draw();
+
 }
 
 void Renderer::toggleAutoCam() {
