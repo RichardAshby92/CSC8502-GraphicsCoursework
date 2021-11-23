@@ -10,30 +10,33 @@ ParticleControl::ParticleControl(Vector3 heightmapSize) {
 
 	//static const GLfloat colourData[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
 
-	particleSpeed = Vector3(0.0f, -100.0f, 0.0f);
-	particleColour = Vector4(0.6f, 0.6f, 0.6f, 1.0f);
+	particleSpeed = Vector3(0.0f, -400.0f, 0.0f);
+	particleColour = Vector4(0.8f, 0.7f, 0.5f, 1.0f);
+	vertices = new Vector3[particleAmount];
+	colours = new Vector4[particleAmount];
 
 	//GLuint particleTexture = 0;
 
 	for (int i = 0; i < particleAmount; ++i) {
 			
-		float posX = rand() % 6000 + 2000;
-		float posY = rand() % 255 + 50;
-		float posZ = rand() % 6000 + 2000;
+		float posX = rand() % 7000 + 500;
+		float posY = rand() % 2000;
+		float posZ = rand() % 7000 + 500;
 
 		ParticleContainer[i] = new Particle;
 		ParticleContainer[i]->particlePosition = Vector3(posX, posY, posZ);
+		ParticleContainer[i]->particleColour = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
 	}
 
 	glGenBuffers(1, &bufferObject[VERTEX_BUFFER]);
 	glBindBuffer(GL_ARRAY_BUFFER, bufferObject[VERTEX_BUFFER]);
 	glBufferData(GL_ARRAY_BUFFER, particleAmount * sizeof(Vector3), 0, GL_DYNAMIC_DRAW);
 
-	/*
 	glGenBuffers(1, &bufferObject[COLOUR_BUFFER]);
 	glBindBuffer(GL_ARRAY_BUFFER, bufferObject[COLOUR_BUFFER]);
-	glBufferData(GL_ARRAY_BUFFER, particleAmount * sizeof(Vector4), 0, GL_DYNAMIC_DRAW);*/
+	glBufferData(GL_ARRAY_BUFFER, particleAmount * sizeof(Vector4), 0, GL_DYNAMIC_DRAW);
 
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 
@@ -44,10 +47,9 @@ ParticleControl::~ParticleControl() {
 
 void ParticleControl::Draw() {
 
-	vertices = new Vector3[particleAmount];
-
 	for (int i = 0; i < particleAmount; ++i) {
 		vertices[i] = ParticleContainer[i]->particlePosition;
+		colours[i] = ParticleContainer[i]->particleColour;
 	}
 
 	glBindVertexArray(arrayObject);
@@ -57,7 +59,13 @@ void ParticleControl::Draw() {
 	glVertexAttribPointer(VERTEX_BUFFER, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
 	glEnableVertexAttribArray(VERTEX_BUFFER);
 
+	glBindBuffer(GL_ARRAY_BUFFER, bufferObject[COLOUR_BUFFER]);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, particleAmount * sizeof(Vector4), (void*)colours);
+	glVertexAttribPointer(COLOUR_BUFFER, 4, GL_FLOAT, GL_FALSE, sizeof(Vector4), 0);
+	glEnableVertexAttribArray(COLOUR_BUFFER);
+
 	glDrawArrays(GL_POINTS, 0, particleAmount);
+	glBindVertexArray(0);
 }
 
 void ParticleControl::Update(float dt) {
@@ -70,7 +78,7 @@ void ParticleControl::Update(float dt) {
 }
 
 void ParticleControl::ResetParticle(int i) {
-	ParticleContainer[i]->particlePosition.y = 255;
+	ParticleContainer[i]->particlePosition.y = 2000;
 }
 
 /*

@@ -7,6 +7,7 @@
 struct Particle {
 
 	Vector3 particlePosition;
+	Vector4 particleColour;
 };
 
 class ParticleControl : public Mesh {
@@ -19,6 +20,9 @@ public:
 
 	Vector3* GetWorldTransform();
 	Vector3 GetModelScale();
+	Vector4 GetColour() { return particleColour; }
+	GLuint GetTexture() { return texture; }
+
 	int GetParticleAmount() { return particleAmount; }
 
 	int FindUnusedParticles();
@@ -41,4 +45,6 @@ protected:
 	Vector3 particleScale;
 	Vector3 particleOrigin[particleAmount];
 	Vector4 particleColour;
+
+	GLuint texture;
 };

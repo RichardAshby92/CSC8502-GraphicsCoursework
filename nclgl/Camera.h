@@ -2,6 +2,8 @@
 #include "Matrix4.h"
 #include "Vector3.h"
 
+class Markers;
+
 class Camera {
 public:
 	Camera(void) {
@@ -37,4 +39,8 @@ protected:
 
 	Vector3 start = Vector3(7984.0f * 0.3f, 255.0f * 0.2f, 7984.0f * 0.65f);
 	Vector3 end = Vector3(7984.0f * 0.6f, 255.0f * 1.5f, 7984.0f * 0.35f);
+
+	Markers* markers;
+
+	int waypointNumber;
 };

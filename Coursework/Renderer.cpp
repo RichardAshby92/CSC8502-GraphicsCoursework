@@ -55,13 +55,13 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	skyboxShader = new Shader("skyboxVertex.glsl", "skyboxFragment.glsl");
 	reflectShader = new Shader("reflectVertex.glsl", "reflectFragment.glsl");
 	terrainShader = new Shader("TerrainVertex.glsl", "TerrainFragment.glsl");
-	//rainShader = new Shader("RainVertex.glsl","RainFragment.glsl");
+	rainShader = new Shader("RainVertex.glsl","RainFragment.glsl");
 
 	if (!sceneShader->LoadSuccess()) { return; }
 	if (!skyboxShader->LoadSuccess()) { return; } 
 	if (!reflectShader->LoadSuccess()) {return;} 
 	if (!terrainShader->LoadSuccess()) { return; }
-	//if (!rainShader->LoadSuccess()) { return; }
+	if (!rainShader->LoadSuccess()) { return; }
 
 	//load root
 	root = new SceneNode();
@@ -120,9 +120,6 @@ void Renderer::RenderScene()	{
 	//disable culling etc
 
 	DrawSkyBox();
-
-
-
 	DrawHeightMap();
 
 	DrawNode(root);	
@@ -191,7 +188,6 @@ void Renderer::DrawNode(SceneNode* n) {
 			}
 		}
 		else{ n->Draw(*this); }
-
 	}
 
 	for (vector<SceneNode*>::const_iterator i = n->GetChildIteratorStart(); i != n->GetChildIteratorEnd(); ++i) {
@@ -225,7 +221,6 @@ void Renderer::DrawWater() {
 
 	UpdateShaderMatrices();
 	quad->Draw();
-
 }
 
 void Renderer::DrawRain(ParticleControl* rain) {
@@ -234,16 +229,13 @@ void Renderer::DrawRain(ParticleControl* rain) {
 	BindShader(sceneShader);
 	UpdateShaderMatrices();
 
-	
-	//Matrix4 model = Matrix4::Translation(rain->GetWorldTransform()[i]) * Matrix4::Scale(rain->GetModelScale());
-	//glUniformMatrix4fv(glGetUniformLocation(sceneShader->GetProgram(), "modelMatrix"), 1, false, model.values);
-
-	glUniform1i(glGetUniformLocation(sceneShader->GetProgram(), "diffuseTex"), 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, rainTex);
+	glUniform4fv(glGetUniformLocation(sceneShader->GetProgram(), "nodeColour"), 1, (float*)&rain->GetColour());
+	//glUniform1i(glGetUniformLocation(sceneShader->GetProgram(), "useTexture"), rain->GetTexture());
+	//glUniform1i(glGetUniformLocation(rainShader->GetProgram(), "diffuseTex"), 0);
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, rainTex);
 
 	rain->Draw();
-
 }
 
 void Renderer::toggleAutoCam() {

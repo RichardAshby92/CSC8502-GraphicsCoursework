@@ -5,15 +5,21 @@ class Mesh;
 
 class Markers : public SceneNode {
 public:
+	Markers(){}
 	Markers(Vector3	heightmapSize);
 	~Markers() {};
 
 	void Update(float dt) override;
-	Vector3 GetCameraPos();
+	std::vector<Vector3> GetMarkers() { return markers; };
+
 
 protected:
 	SceneNode* camStart;
 	SceneNode* camEnd;
+	SceneNode* wayPoint1;
+	SceneNode* wayPoint2;
+	SceneNode* wayPoint3;
+	SceneNode* wayPoint4;
 
 	SceneNode* marker;
 	SceneNode* marker1;
@@ -23,4 +29,5 @@ protected:
 
 	Mesh* cube;
 
+	std::vector<Vector3> markers;
 };

@@ -6,6 +6,7 @@ uniform mat4 projMatrix;
 uniform vec4 nodeColour;
 
 in vec3 position;
+in vec4 colour;
 in vec2 texCoord;
 
 out Vertex {

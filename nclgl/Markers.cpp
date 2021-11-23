@@ -6,19 +6,55 @@ Markers::Markers(Vector3 heightmapSize) {
 	//markers
 	Mesh* cube = Mesh::LoadFromMeshFile("OffsetCubeY.msh");
 
-	camStart = new SceneNode(cube, Vector4(1, 0, 0, 1)); //camera
+	camStart = new SceneNode(cube, Vector4(1, 0, 0, 1)); //camera Start
 	camStart->SetModelScale(Vector3(10, 10, 10));
 	camStart->SetTransform(Matrix4::Translation(heightmapSize * Vector3(0.3f, 0.2f, 0.65f)));
 	camStart->SetTexture(0);
 	camStart->SetBoundingRadius(1);
+	markers.emplace_back(camStart->GetTransform());
 	AddChild(camStart);
 
-	camEnd = new SceneNode(cube, Vector4(1, 0, 0, 1)); //cam marker
+	wayPoint1 = new SceneNode(cube, Vector4(1, 0, 0, 1)); 
+	wayPoint1->SetModelScale(Vector3(10, 10, 10));
+	wayPoint1->SetTransform(Matrix4::Translation(heightmapSize * Vector3(0.4f, 0.2f, 0.65f)));
+	wayPoint1->SetTexture(0);
+	wayPoint1->SetBoundingRadius(1);
+	//markers.emplace_back(wayPoint1->GetTransform());
+	AddChild(wayPoint1);
+
+	wayPoint2 = new SceneNode(cube, Vector4(1, 0, 0, 1)); 
+	wayPoint2->SetModelScale(Vector3(10, 10, 10));
+	wayPoint2->SetTransform(Matrix4::Translation(heightmapSize * Vector3(0.5f, 0.2f, 0.65f)));
+	wayPoint2->SetTexture(0);
+	wayPoint2->SetBoundingRadius(1);
+	//markers.emplace_back(wayPoint2->GetTransform());
+	AddChild(wayPoint2);
+
+	wayPoint3 = new SceneNode(cube, Vector4(1, 0, 0, 1)); 
+	wayPoint3->SetModelScale(Vector3(10, 10, 10));
+	wayPoint3->SetTransform(Matrix4::Translation(heightmapSize * Vector3(0.5f, 0.2f, 0.5f)));
+	wayPoint3->SetTexture(0);
+	wayPoint3->SetBoundingRadius(1);
+	//markers.emplace_back(wayPoint3->GetTransform());
+	AddChild(wayPoint3);
+
+	wayPoint4 = new SceneNode(cube, Vector4(1, 0, 0, 1)); 
+	wayPoint4->SetModelScale(Vector3(10, 10, 10));
+	wayPoint4->SetTransform(Matrix4::Translation(heightmapSize * Vector3(0.6f, 1.0f, 0.4f)));
+	wayPoint4->SetTexture(0);
+	wayPoint4->SetBoundingRadius(1);
+	//markers.emplace_back(wayPoint4->GetTransform());
+	AddChild(wayPoint4);
+
+	camEnd = new SceneNode(cube, Vector4(1, 0, 0, 1)); //cam End
 	camEnd->SetModelScale(Vector3(10, 10, 10));
 	camEnd->SetTransform(Matrix4::Translation(heightmapSize * Vector3(0.6f, 1.5f, 0.35f)));
 	camEnd->SetTexture(0);
 	camEnd->SetBoundingRadius(1);
+	//markers.emplace_back(camEnd->GetTransform());
 	AddChild(camEnd);
+
+	//reference only
 
 	marker1 = new SceneNode(cube, Vector4(1, 0, 0, 1)); //Top Left
 	marker1->SetModelScale(Vector3(10, 10, 10));
