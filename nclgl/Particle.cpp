@@ -72,13 +72,13 @@ void ParticleControl::Update(float dt) {
 
 	for (int i = 0; i < particleAmount; ++i)
 	{
-		if (cmpr(ParticleContainer[i]->particlePosition.y, 0.0f, 1.0f)) { ResetParticle(i); }
+		if (cmpr(ParticleContainer[i]->particlePosition.y, 0.0f, 5.0f)) { ResetParticle(i); }
 		else { ParticleContainer[i]->particlePosition += (particleSpeed * dt); }
 	}
 }
 
 void ParticleControl::ResetParticle(int i) {
-	ParticleContainer[i]->particlePosition.y = 2000;
+	ParticleContainer[i]->particlePosition.y = rand() % 1000 + 1000;
 }
 
 /*

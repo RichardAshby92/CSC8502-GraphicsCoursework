@@ -11,7 +11,7 @@ Markers::Markers(Vector3 heightmapSize) {
 	camStart->SetTransform(Matrix4::Translation(heightmapSize * Vector3(0.3f, 0.2f, 0.65f)));
 	camStart->SetTexture(0);
 	camStart->SetBoundingRadius(1);
-	markers.emplace_back(camStart->GetTransform());
+	//markers.emplace_back(camStart->GetTransform());
 	AddChild(camStart);
 
 	wayPoint1 = new SceneNode(cube, Vector4(1, 0, 0, 1)); 

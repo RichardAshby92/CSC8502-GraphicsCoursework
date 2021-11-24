@@ -61,7 +61,7 @@ Renderer::Renderer(Window &parent) : OGLRenderer(parent)	{
 	if (!skyboxShader->LoadSuccess()) { return; } 
 	if (!reflectShader->LoadSuccess()) {return;} 
 	if (!terrainShader->LoadSuccess()) { return; }
-	if (!rainShader->LoadSuccess()) { return; }
+	//if (!rainShader->LoadSuccess()) { return; }
 
 	//load root
 	root = new SceneNode();
@@ -122,10 +122,11 @@ void Renderer::RenderScene()	{
 	DrawSkyBox();
 	DrawHeightMap();
 
-	DrawNode(root);	
+	
 
 	DrawRain(rain);
 	DrawWater();
+	DrawNode(root);
 
 	//renable culling etc
 }
